@@ -49,3 +49,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Testing export
         run: poetry export --format requirements.txt --output requirements.txt
+      - name: Cat export
+        run: cat requirements.txt
+      
