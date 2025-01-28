@@ -40,7 +40,9 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
       - name: Install poetry
-        run: pipx install poetry
+        run: |
+          pipx install poetry
+          pipx inject poetry git+https://github.com/python-poetry/poetry-plugin-export@09aec2dce7fb27e15164b09f4d49fa99871fdb6b # v1.9.0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
