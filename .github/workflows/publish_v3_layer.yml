@@ -50,3 +50,11 @@ jobs:
         run: git status
       - name: git diff
         run: git diff
+      - name: Create PR
+        id: create-pr
+        uses: ./.github/actions/create-pr
+        with:
+          files: "docs/index.md docs/includes/_layer_homepage_arm64.md docs/includes/_layer_homepage_x86.md examples CHANGELOG.md"
+          temp_branch_prefix: "ci-layer-docs"
+          pull_request_title: "chore(ci): layer docs update"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
