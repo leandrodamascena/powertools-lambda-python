@@ -40,7 +40,8 @@ jobs:
     steps:
       - name: Checkout repository # reusable workflows start clean, so we need to checkout again
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-
+      - name: check code
+        run: ls -la
       - name: Replace layer versions in documentation
         run: ./layer_v3/scripts/update_layer_arn_v3.sh ${{ inputs.layer_documentation_version }}
       # NOTE: It felt unnecessary creating yet another PR to update changelog w/ latest tag
