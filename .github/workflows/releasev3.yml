@@ -1,0 +1,64 @@
+name: Release V3
+
+# RELEASE PROCESS
+#
+# === Automated activities ===
+#
+# 1.  [Seal] Bump to release version and export source code with integrity hash
+# 2.  [Quality check] Restore sealed source code, run tests, linting, security and complexity base line
+# 3.  [Build] Restore sealed source code, create and export hashed build artifact for PyPi release (wheel, tarball)
+# 4.  [Provenance] Generates provenance for build, signs attestation with GitHub OIDC claims to confirm it came from this release pipeline, commit, org, repo, branch, hash, etc.
+# 5.  [Release] Restore built artifact, and publish package to PyPi prod repository
+# 6.  [Create Tag] Restore sealed source code, create a new git tag using released version, uploads provenance to latest draft release
+# 7.  [PR to bump version] Restore sealed source code, and create a PR to update trunk with latest released project metadata
+# 8.  [Publish Layer v3] Compile Layer in multiple Python versions and kick off pipeline for beta, prod, and canary releases
+# 9.  [Publish Layer v3] Update docs with latest Layer ARNs and Changelog
+# 10. [Publish Layer v3] Create PR to update trunk so staged docs also point to the latest Layer ARN, when merged
+# 12. [Post release] Close all issues labeled "pending-release" and notify customers about the release
+#
+# === Manual activities ===
+#
+# 1. Kick off this workflow with the intended version
+# 2. Update draft release notes after this workflow completes
+# 3. If not already set, use `v<new version>` as a tag, e.g., v3.0.0, and select develop as target branch
+
+# NOTE
+#
+# See MAINTAINERS.md "Releasing a new version" for release mechanisms
+#
+# Every job is isolated and starts a new fresh container.
+
+env:
+  RELEASE_COMMIT: ${{ github.sha }}
+  RELEASE_TAG_VERSION: ${{ inputs.version_to_publish }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_to_publish:
+        description: "Version to be released in PyPi, Docs, and Lambda Layer, e.g. v3.0.0, v3.0.0a0 (pre-release)"
+        default: v3.0.0
+        required: true
+      layer_documentation_version:
+        description: "Lambda layer version to be updated in our documentation. e.g. if the current layer number is 3, this value must be 4."
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+
+  publish_layer:
+    secrets: inherit
+    permissions:
+      id-token: write
+      contents: write
+      pages: write
+      pull-requests: write
+    uses: ./.github/workflows/publish_v3_layer.yml
+    with:
+      latest_published_version: ${{ inputs.version_to_publish }}
+      layer_documentation_version: ${{ inputs.layer_documentation_version }}
+
+  
